@@ -23,9 +23,28 @@ class TextEditor:
             ("Save", self.save_file),
             ("Exit", self.root.destroy)
         ]
-
+        
         for label, command in menu_items:
             self.file_menu.add_command(label=label, command=command)
+        
+        self.create_edit_menu()
+        
+        
+    def create_edit_menu(self):
+            
+        self.edit_menu = tk.Menu(self.menu_bar, tearoff=0)
+        self.menu_bar.add_cascade(label="Edit", menu=self.edit_menu)
+        
+        edit_menu_items = [
+            ("Undo", self.undo),
+            ("Redo", self.redo),
+            ("Copy", self.copy),
+            ("Cut", self.cut),
+            ("Paste", self.paste)
+        ]
+
+        for label, command in edit_menu_items:
+            self.edit_menu.add_command(label=label, command=command)
 
     def new_file(self):
         self.text_widget.delete(1.0, tk.END)
@@ -49,6 +68,24 @@ class TextEditor:
         if file_path:
             with open(file_path, "w") as file:
                 file.write(self.text_widget.get(1.0, tk.END))
+                
+    
+    def undo(self):
+        self.text_widget.edit_undo()
+        
+    def redo(self):
+        self.text_widget.edit_redo()
+    
+    def copy(self):
+        self.text_widget.event_generate("<<Copy>>")
+        
+    def cut(self):
+        self.text_widget.event_generate("<<Cut>>")
+        
+    def paste(self):
+        self.text_widget.event_generate("<<Paste>>")
+    
+    
 
 if __name__ == "__main__":
     root = tk.Tk()
