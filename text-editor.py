@@ -1,5 +1,8 @@
 import tkinter as tk
 from tkinter import filedialog
+from pygments import lex
+from pygments.lexers import get_lexer_by_name
+from pygments.token import Token
 
 class TextEditor:
     def __init__(self, root):
@@ -9,6 +12,8 @@ class TextEditor:
         self.text_widget.pack(expand="yes", fill="both")
 
         self.create_menu()
+        
+        self.lexer = None
 
     def create_menu(self):
         self.menu_bar = tk.Menu(self.root)
@@ -86,6 +91,31 @@ class TextEditor:
         self.text_widget.event_generate("<<Paste>>")
     
     
+    def update_highlights(self):
+        content = self.text_widget.get("1.0, tk.END")
+        lexer = self.get_lexer_for_lang("python")
+        tokens = lex(content, lexer)
+        self.apply_syntax_highlights(tokens)
+        
+    def get_lexer_for_lang(self, lang):
+        return get_lexer_by_name(lang, stripall=True)
+    
+    def apply_highlights(self, tokens):
+        self.text_widget.tag_configure("Token.Keyword", foreground="cyan")
+        self.text_widget.tag_configure("Token.Comment", foreground="green")
+        self.text_widget.tag_configure("Token.String", foreground="purple")
+        self.text_widget.tag_configure("Token.Number", foreground="orange")
+        
+        for token, content in tokens:
+            tag_name = str(token)
+            start_index = "1.0"
+            while True:
+                start_index = self.text_widget.search(content, start_index, tk.END)
+                if not start_index:
+                    break
+                end_index = f"{start_index}+{len(content)}c"
+                self.text_widget.tag_add(tag_name, start_index, end_index)
+                start_index = end_index
 
 if __name__ == "__main__":
     root = tk.Tk()
