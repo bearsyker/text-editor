@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import ttk, filedialog
 from pygments import lex
 from pygments.lexers import get_lexer_by_name
 from pygments.token import Token
@@ -8,12 +8,25 @@ class TextEditor:
     def __init__(self, root):
         self.root = root
         self.root.title("Custom Text Editor")
-        self.text_widget = tk.Text(self.root, wrap="word", undo=True)
-        self.text_widget.pack(expand="yes", fill="both")
-
+        self.notebook = ttk.Notebook(self.root)
+        self.notebook.pack(expand="yes", fill="both")
+        
+        self.add_tab()
         self.create_menu()
         
-        self.lexer = None
+    
+    def add_tab(self):
+        frame = ttk.Frame(self.notebook)
+        frame.pack(fill="both", expand=True)
+        
+        text_widget = tk.Text(frame, wrap="word", undo=True)
+        text_widget.pack(expand="yes", fill="both")
+        
+        self.notebook.add(frame,text="Untitled")
+        self.notebook.select(frame)
+        self.notebook.bind("<<NotebookTabChanged>>", self.update_highlights)
+        
+        
 
     def create_menu(self):
         self.menu_bar = tk.Menu(self.root)
@@ -32,11 +45,8 @@ class TextEditor:
         for label, command in menu_items:
             self.file_menu.add_command(label=label, command=command)
         
-        self.create_edit_menu()
         
-        
-    def create_edit_menu(self):
-            
+
         self.edit_menu = tk.Menu(self.menu_bar, tearoff=0)
         self.menu_bar.add_cascade(label="Edit", menu=self.edit_menu)
         
@@ -52,7 +62,7 @@ class TextEditor:
             self.edit_menu.add_command(label=label, command=command)
 
     def new_file(self):
-        self.text_widget.delete(1.0, tk.END)
+        self.add_tab()
 
     def open_file(self):
         file_path = filedialog.askopenfilename(
@@ -62,49 +72,76 @@ class TextEditor:
 
         if file_path:
             with open(file_path, "r") as file:
-                self.text_widget.delete(1.0, tk.END)
-                self.text_widget.insert(tk.END, file.read())
+                content = file.read()
+                self.add_tab()
+                current_tab = self.notebook.select()
+                text_widget = self.notebook.nametowidget(current_tab).winfo_children()[0]
+                text_widget.delete(1.0, tk.END)
+                text_widget.insert(tk.END, content)
+                self.update_highlights()
 
     def save_file(self):
+        current_tab = self.notebook.select()
+        text_widget = self.notebook.nametowidget(current_tab).winfo_children()[0]
+        
         file_path = filedialog.asksaveasfilename(
             defaultextension=".txt",
             filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")]
         )
         if file_path:
             with open(file_path, "w") as file:
-                file.write(self.text_widget.get(1.0, tk.END))
+                file.write(text_widget.get(1.0, tk.END))
                 
     
     def undo(self):
-        self.text_widget.edit_undo()
+        current_tab = self.notebook.select()
+        text_widget = self.notebook. nametowidget(current_tab).winfo_children()[0]
+        text_widget.edit_undo()
         
     def redo(self):
-        self.text_widget.edit_redo()
+        current_tab = self.notebook.select()
+        text_widget = self.notebook. nametowidget(current_tab).winfo_children()[0]
+        text_widget.edit_redo()
     
     def copy(self):
-        self.text_widget.event_generate("<<Copy>>")
+        current_tab = self.notebook.select()
+        text_widget = self.notebook. nametowidget(current_tab).winfo_children()[0]
+        text_widget.event_generate("<<Copy>>")
         
     def cut(self):
-        self.text_widget.event_generate("<<Cut>>")
+        current_tab = self.notebook.select()
+        text_widget = self.notebook. nametowidget(current_tab).winfo_children()[0]
+        text_widget.event_generate("<<Cut>>")
         
     def paste(self):
-        self.text_widget.event_generate("<<Paste>>")
+        current_tab = self.notebook.select()
+        text_widget = self.notebook. nametowidget(current_tab).winfo_children()[0]
+        text_widget.event_generate("<<Paste>>")
+        
     
+    # start highlights
     
-    def update_highlights(self):
+    def update_highlights(self, event=None):
+        current_tab = self.notebook.select()
+        text_widget = self.notebook.nametowidget(current_tab).winfo_children()[0]
         content = self.text_widget.get("1.0, tk.END")
         lexer = self.get_lexer_for_lang("python")
         tokens = lex(content, lexer)
-        self.apply_syntax_highlights(tokens)
+        self.apply_syntax_highlights(text_widget, tokens)
         
     def get_lexer_for_lang(self, lang):
         return get_lexer_by_name(lang, stripall=True)
     
-    def apply_highlights(self, tokens):
+    def apply_highlights(self, text_widget, tokens):
         self.text_widget.tag_configure("Token.Keyword", foreground="cyan")
         self.text_widget.tag_configure("Token.Comment", foreground="green")
         self.text_widget.tag_configure("Token.String", foreground="purple")
         self.text_widget.tag_configure("Token.Number", foreground="orange")
+        
+        text_widget.tag_remove("Token.Keyword", "1.0", tk.END)
+        text_widget.tag_remove("Token.Comment", "1.0", tk.END)
+        text_widget.tag_remove("Token.String", "1.0", tk.END)
+        text_widget.tag_remove("Token.Number", "1.0", tk.END)
         
         for token, content in tokens:
             tag_name = str(token)
