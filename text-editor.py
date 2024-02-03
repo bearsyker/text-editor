@@ -5,7 +5,6 @@ from PyQt5.QtCore import Qt
 from pygments import lex
 from pygments.lexers import get_lexer_by_name
 import customization
-import handle_files
 
 
 
@@ -37,66 +36,74 @@ class TextEditor(QMainWindow):
         
 
     def create_menu(self):
-        self.menu_bar = tk.Menu(self.root)
-        self.root.config(menu=self.menu_bar)
-
-        self.file_menu = tk.Menu(self.menu_bar, tearoff=0)
-        self.menu_bar.add_cascade(label="File", menu=self.file_menu)
-
-        file_menu_items = [
-            ("New", self.new_file),
-            ("Open", self.open_file),
-            ("Save", self.save_file),
-            ("Exit", self.root.destroy)
-        ]
-
-        for label, command in file_menu_items:
-            self.file_menu.add_command(label=label, command=command)
-
-        self.edit_menu = tk.Menu(self.menu_bar, tearoff=0)
-        self.menu_bar.add_cascade(label="Edit", menu=self.edit_menu)
-
-        edit_menu_items = [
-            ("Undo", self.undo),
-            ("Redo", self.redo),
-            ("Copy", self.copy),
-            ("Cut", self.cut),
-            ("Paste", self.paste)
-        ]
-
-        for label, command in edit_menu_items:
-            self.edit_menu.add_command(label=label, command=command)
-
-        # Create a submenu for customization
-        self.customization_menu = tk.Menu(self.menu_bar, tearoff=0)
-        self.menu_bar.add_cascade(label="Customize", menu=self.customization_menu)
-
-
-
+        menubar = self.menuBar()
+        
+        file_menu = menubar.addMenu('File')
+        file_menu.addAction('New', self.new_self, QKeySequence.New)
+        file_menu.addAction('Open', self.open_file, QKeySequence.Open)
+        file_menu.addAction('Save', self.save_file, QKeySequence.Save)
+        file_menu.addSeparator()
+        file_menu.addAction('Exit', self.close, QKeySequence.Quit)
+        
+        edit_menu = menubar.addMenu('Edit')
+        edit_menu.addAction('Undo', self.undo, QKeySequence.Undo)
+        edit_menu.addAction('Redo', self.redo, QKeySequence.Redo)
+        edit_menu.addAction('Copy', self.copy, QKeySequence.Copy)
+        edit_menu.addAction('Cut', self.cut, QKeySequence.Cut)
+        edit_menu.addAction('Paste', self.paste, QKeySequence.Paste)
+    
+    def new_file(self):
+        self.add_tab()
+        
+    def open_file(self):
+        file_path, _ = QFileDialog.getOpenFileName(self, 'Open File', '', 'Text Files (*.txt);;All Files (*)')
+        if file_path:
+            with open(file_path, 'r') as file:
+                content = file.read()
+                self.add_tab()
+                current_tab = self.tabs.currentIndex()
+                text_widget = self.tabs.widget(current_tab)
+                text_widget.setPlainText(content)
+                self.update_highlights(text_widget)
+        
+    def save_file(self):
+        current_tab = self.tabs.currentIndex()
+        text_widget = self.tabs.widget(current_tab)
+        file_path, _ = QFileDialog.getSaveFileName(self, 'Save File', '', 'Text Files (*.txt);;All Files (*)')
+        if file_path:
+            with open(file_path, 'w') as file:
+                file.write(text_widget.toPlainText())
+        
+    def close_tab(self, index):
+        self.tabs.removeTab(index)
+    
+    
     def undo(self):
-        current_tab = self.notebook.select()
-        text_widget = self.notebook.nametowidget(current_tab).winfo_children()[0]
-        text_widget.edit_undo()
+        current_tab = self.tabs.currentIndex()
+        text_widget = self.tabs.widget(current_tab)
+        text_widget.undo()
 
     def redo(self):
-        current_tab = self.notebook.select()
-        text_widget = self.notebook.nametowidget(current_tab).winfo_children()[0]
-        text_widget.edit_redo()
+        current_tab = self.tabs.currentIndex()
+        text_widget = self.tabs.widget(current_tab)
+        text_widget.redo()
 
     def copy(self):
-        current_tab = self.notebook.select()
-        text_widget = self.notebook.nametowidget(current_tab).winfo_children()[0]
-        text_widget.event_generate("<<Copy>>")
-
+        current_tab = self.tabs.currentIndex()
+        text_widget = self.tabs.widget(current_tab)
+        text_widget.copy()
+        
     def cut(self):
-        current_tab = self.notebook.select()
-        text_widget = self.notebook.nametowidget(current_tab).winfo_children()[0]
-        text_widget.event_generate("<<Cut>>")
+        current_tab = self.tabs.currentIndex()
+        text_widget = self.tabs.widget(current_tab)
+        text_widget.cut()
 
     def paste(self):
-        current_tab = self.notebook.select()
-        text_widget = self.notebook.nametowidget(current_tab).winfo_children()[0]
-        text_widget.event_generate("<<Paste>>")
+        current_tab = self.tabs.currentIndex()
+        text_widget = self.tabs.widget(current_tab)
+        text_widget.paste()
+        
+    
 
 
 if __name__ == "__main__":
