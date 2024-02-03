@@ -31,17 +31,10 @@ class TextEditor(QMainWindow):
         
 
     def add_tab(self):
-        frame = ttk.Frame(self.notebook)
-        frame.pack(fill="both", expand=True)
-
-        text_widget = tk.Text(frame, wrap="word", undo=True)
-        text_widget.pack(expand="yes", fill="both")
-
-        self.notebook.add(frame, text="Untitled")
-        self.notebook.select(frame)
-
         
-        self.notebook.bind("<<NotebookTabChanged>>", self.update_customization)
+        text_widget = QTextEdit(self)
+        self.tabs.addTab(text_widget, "Untitled")
+        
 
     def create_menu(self):
         self.menu_bar = tk.Menu(self.root)
