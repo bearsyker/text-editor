@@ -1,29 +1,34 @@
-import tkinter as tk
-from tkinter import ttk, filedialog
+import sys
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QFileDialog, QMenu, QMenuBar, QAction, QTabWidget, QDockWidget, QVBoxLayout, QWidget, QStyleFactory
+from PyQt5.QtGui import QKeySequence
+from PyQt5.QtCore import Qt
 from pygments import lex
 from pygments.lexers import get_lexer_by_name
-from pygments.token import Token
+import customization
+import handle_files
 
 
 
-class TextEditor:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Customizable Text Editor")
+class TextEditor(QMainWindow):
+    def __init__(self):
+        super().__init__()
 
-        self.theme_var = tk.StringVar()
-        self.font_var = tk.StringVar()
+        self.setWindowTitle("My Text Editor")
+        
+        self.tabs = QTabWidget(self)
+        self.tabs.setTabsClosable(True)
+        self.tabs.tabCloseRequested.connect(self.close_tab)
 
-        self.theme_var.set("default")
-        self.font_var.set("TkDefaultFont")
-
-        self.notebook = ttk.Notebook(self.root)
-        self.notebook.pack(expand="yes", fill="both")
+        self.theme_var = "default"
+        self.font_var = "TkDefaultFont"
 
         self.add_tab()
-
         self.create_menu()
-        self.create_customization_options()
+        self.create_custom_options()
+        self.setCentralWidget(self.tabs)
+        
+        
+        
 
     def add_tab(self):
         frame = ttk.Frame(self.notebook)
