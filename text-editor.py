@@ -23,7 +23,6 @@ class TextEditor(QMainWindow):
 
         self.add_tab()
         self.create_menu()
-        self.create_custom_options()
         self.setCentralWidget(self.tabs)
         
         
@@ -39,7 +38,7 @@ class TextEditor(QMainWindow):
         menubar = self.menuBar()
         
         file_menu = menubar.addMenu('File')
-        file_menu.addAction('New', self.new_self, QKeySequence.New)
+        file_menu.addAction('New', self.new_file, QKeySequence.New)
         file_menu.addAction('Open', self.open_file, QKeySequence.Open)
         file_menu.addAction('Save', self.save_file, QKeySequence.Save)
         file_menu.addSeparator()
@@ -103,10 +102,21 @@ class TextEditor(QMainWindow):
         text_widget = self.tabs.widget(current_tab)
         text_widget.paste()
         
-    
+    def update_highlights(self, text_widget):
+        content = text_widget.toPlainText()
+        lexer = get_lexer_by_name("python")
+        tokens = lex(content, lexer)
+        self.apply_highlights(text_widget, tokens)
+        
+    def apply_highlights(self, text_widget, tokens):
+        pass
 
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    editor = TextEditor(root)
-    root.mainloop()
+    app = QApplication(sys.argv)
+    app.setStyle(QStyleFactory.create("Fusion"))
+    
+    editor = TextEditor()
+    editor.show()
+    
+    sys.exit(app.exec_())
