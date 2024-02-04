@@ -4,7 +4,7 @@ from PyQt5.QtGui import QKeySequence
 from PyQt5.QtCore import Qt
 from pygments import lex
 from pygments.lexers import get_lexer_by_name
-import customization
+from customization import Customization
 
 
 
@@ -18,14 +18,11 @@ class TextEditor(QMainWindow):
         self.tabs.setTabsClosable(True)
         self.tabs.tabCloseRequested.connect(self.close_tab)
 
-        self.theme_var = "default"
-        self.font_var = "TkDefaultFont"
-
         self.add_tab()
         self.create_menu()
         self.setCentralWidget(self.tabs)
         
-        
+        self.customization = Customization(self)
         
 
     def add_tab(self):
@@ -108,8 +105,7 @@ class TextEditor(QMainWindow):
         tokens = lex(content, lexer)
         self.apply_highlights(text_widget, tokens)
         
-    def apply_highlights(self, text_widget, tokens):
-        pass
+    
 
 
 if __name__ == "__main__":

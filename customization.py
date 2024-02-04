@@ -1,34 +1,51 @@
-
-
-
-def create_customization_options(self):
-    theme_menu = tk.Menu(self.customization_menu, tearoff=0)
-    self.customization_menu.add_cascade(label="Theme", menu=theme_menu)
-    themes = ["default", "clam", "alt", "classic"]
-    for theme in themes:
-        theme_menu.add_radiobutton(label=theme, variable=self.theme_var, value=theme, command=self.update_customization)
-
-    font_menu = tk.Menu(self.customization_menu, tearoff=0)
-    self.customization_menu.add_cascade(label="Font", menu=font_menu)
-    fonts = ["TkDefaultFont", "Helvetica", "Courier"]
-    for font in fonts:
-        font_menu.add_radiobutton(label=font, variable=self.font_var, value=font, command=self.update_customization)
+from PyQt5.QtWidgets import QMenu, QStyleFactory, QAction
+from PyQt5.QtCore import Qt
+class Customization:
+    def __init__(self, parent):
+        self.parent = parent
+        self.theme_var = "default"
+        self.font_var = "TkDefaultFont"
+        self.custom_menu()
+        
+    def custom_menu(self):
+        menubar = self.parent.menuBar()
+        
+        self.customize_menu = menubar.addMenu('Customize')
+        
+        theme_menu = QMenu('Theme', self.customize_menu)
+        self.customize_menu.addMenu(theme_menu)
+        themes = ['default', 'clam', 'alt', 'classic']
+        for theme in themes:
+            action = QAction(theme, theme_menu, checkable=True)  #Also add option to uncheck others when checked 1
+            action.toggled.connect(self.update_custom)
+            theme_menu.addAction(action)
             
-
-
-
-def update_customization(self, event=None):
+        font_menu = QMenu('Font', self.customize_menu)
+        self.customize_menu.addMenu(font_menu)
+        fonts = ["default", "Helvetica", "Courier"]
+        for font in fonts:
+            action = QAction(font, font_menu, checkable=True)
+            action.toggled.connect(self.update_custom)
+            font_menu.addAction(action)
+            
+    
+    def update_custom(self):
+        current_tab = self.parent.tabs.currentIndex()
+        txt_widget = self.parent.tabs.widget(current_tab)
         
-    current_tab = self.notebook.select()
-    text_widget = self.notebook.nametowidget(current_tab).winfo_children()[0]
-
+        theme = self.theme_var
+        font = self.font_var
         
-    theme = self.theme_var.get()
-    font = self.font_var.get()
-
+        self.parent.setStyle(QStyleFactory.create(theme))
         
-    self.root.tk_setPalette(background="SystemButtonFace", foreground="SystemButtonText")
-    text_widget.config(bg="SystemButtonFace", fg="SystemButtonText", insertbackground="SystemButtonText")
+        txt_widget.setStyleSheet(f"background-color: {self.get_background_color(theme)}; color: {self.get_text_color(theme)}")
+        txt_widget.setTextColor(Qt.black)
+        txt_widget.setTextBackgroundColor(Qt.white) 
+        txt_widget.setFontPointSize(self.get_font_size(font))  
 
-
-    text_widget.config(font=font)
+    
+    # background color
+    
+    # text color
+    
+    # font size
