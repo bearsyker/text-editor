@@ -22,6 +22,7 @@ class TextEditor(QMainWindow):
         self.create_menu()
         self.setCentralWidget(self.tabs)
         
+        
         # theme and customization
         
         self.setGeometry(100, 100, 800, 600)
@@ -33,6 +34,13 @@ class TextEditor(QMainWindow):
 
         self.text_edit = QTextEdit()
         layout.addWidget(self.text_edit)
+        self.theme_button = QPushButton("Apply Dark Theme")
+        self.theme_button.clicked.connect(self.toggle_theme)
+        layout.addWidget(self.theme_button)
+
+        self.default_stylesheet = QApplication.instance().styleSheet()
+        
+        self.custom_menu()
         
 
     def add_tab(self):
@@ -121,17 +129,64 @@ class TextEditor(QMainWindow):
         self.apply_highlights(text_widget, tokens)
         
         
-    
-class Customizing:
-    def __init__(self, parent):
-        self.parent = parent
-        self.theme_var = "default"
-        self.font_var = "DefaultFont"
-        self.custom_menu
-    
         
     def custom_menu(self):
-        pass
+        menuBar = self.menuBar()
+        self.customize_menu = menuBar.addMenu('Customize')
+        
+        theme_menu = QMenu('Theme', self.customize_menu)
+        self.customize_menu.addMenu(theme_menu)
+        themes = ['light', 'dark']
+        for theme in themes:
+            action = QAction(theme, theme_menu, checkable=True)
+            action.toggled.connect(self.update_custom)
+            theme_menu.addAction(action)
+            
+            
+    def toggle_theme(self):
+        current_stylesheet = self.text_edit.styleSheet()
+        
+        if "dark" in current_stylesheet:
+            self.apply_light_theme()
+        else:
+            self.apply_dark_theme()
+            
+            
+    def apply_dark_theme(self):
+        dark_stylesheet = """
+            QTextEdit {
+                background-color: #2b2b2b;
+                color: #ffffff;
+                selection-background-color: #555555;
+            }
+            QPushButton {
+                background-color: #2b2b2b;
+                color: #ffffff;
+            }
+        """
+        self.text_edit.setStyleSheet(dark_stylesheet)
+        self.theme_button.setText('Light Theme')
+        
+    def apply_light_theme(self):
+        self.text_edit.setStyleSheet(self.default_stylesheet)
+        self.theme_button.setText('Dark Theme')
+        
+    def update_custom(self):
+        if self.tabs is None:
+            return
+        
+        current_tab = self.tabs.currentIndex()
+        tab_widget = self.tabs.widget(current_tab)
+        
+        theme = self.theme_var
+        font = self.font_var
+        
+        QApplication.setStyle(QStyleFactory.create(theme))
+        
+        tab_widget.setStyleSheet(f"background-color: {self.get_background_color(theme)}; color: {self.get_text_color(theme)}")
+        tab_widget.setTextColor(Qt.black)
+        tab_widget.setTextBackgroundColor(Qt.white) 
+        tab_widget.setFontPointSize(self.get_font_size(font)) 
 
 
     # Add line numbers and gutter area
