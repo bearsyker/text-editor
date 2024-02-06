@@ -1,7 +1,7 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QFileDialog, QMenu, QMenuBar, QAction, QTabWidget, QDockWidget, QVBoxLayout, QWidget, QStyleFactory
-from PyQt5.QtGui import QKeySequence
-from PyQt5.QtCore import Qt
+from PySide6.QtWidgets import QApplication, QMainWindow, QTextEdit, QFileDialog, QTabWidget, QStyleFactory
+from PySide6.QtGui import QKeySequence
+from PySide6.QtCore import Qt
 from pygments import lex
 from pygments.lexers import get_lexer_by_name
 from customization import Customization

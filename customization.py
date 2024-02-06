@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QMenu, QAction, QRadioButton, QStyleFactory
+from PySide6.QtWidgets import QMenu, QStyleFactory, QWidgetAction
 from PySide6.QtCore import Qt
 
 class Customization:
@@ -17,7 +17,7 @@ class Customization:
         self.customize_menu.addMenu(theme_menu)
         themes = ['default', 'clam', 'alt', 'classic']
         for theme in themes:
-            action = QAction(theme, theme_menu, checkable=True)  #Also add option to uncheck others when checked 1
+            action = QWidgetAction(theme, theme_menu, checkable=True)  #Also add option to uncheck others when checked 1
             action.toggled.connect(self.update_custom)
             theme_menu.addAction(action)
             
@@ -25,7 +25,7 @@ class Customization:
         self.customize_menu.addMenu(font_menu)
         fonts = ["default", "Helvetica", "Courier"]
         for font in fonts:
-            action = QAction(font, font_menu, checkable=True)
+            action = QWidgetAction(font, font_menu, checkable=True)
             action.toggled.connect(self.update_custom)
             font_menu.addAction(action)
             
