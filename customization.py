@@ -1,5 +1,6 @@
-from PyQt5.QtWidgets import QMenu, QStyleFactory, QAction
-from PyQt5.QtCore import Qt
+from PySide6.QtWidgets import QMenu, QAction, QRadioButton, QStyleFactory
+from PySide6.QtCore import Qt
+
 class Customization:
     def __init__(self, parent):
         self.parent = parent
