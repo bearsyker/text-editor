@@ -1,16 +1,16 @@
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QTextEdit, QFileDialog, QTabWidget, QStyleFactory
-from PySide6.QtGui import QKeySequence
+from PySide6.QtWidgets import QApplication, QMenu, QMainWindow, QTextEdit, QFileDialog, QTabWidget, QStyleFactory
+from PySide6.QtGui import QKeySequence, QAction
 from PySide6.QtCore import Qt
 from pygments import lex
 from pygments.lexers import get_lexer_by_name
-from customization import Customization
+#from customization import Customization
 
 
 
 class TextEditor(QMainWindow):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
         self.setWindowTitle("My Text Editor")
         
@@ -22,7 +22,12 @@ class TextEditor(QMainWindow):
         self.create_menu()
         self.setCentralWidget(self.tabs)
         
-        self.customization = Customization(self)
+        self.parent = parent
+        self.theme_var = "default"
+        self.font_var = "TkDefaultFont"
+        self.custom_menu()
+        
+        #self.customization = Customization(self)
         
 
     def add_tab(self):
@@ -99,14 +104,58 @@ class TextEditor(QMainWindow):
         text_widget = self.tabs.widget(current_tab)
         text_widget.paste()
         
+        # Add syntax highlighting
+        
     def update_highlights(self, text_widget):
         content = text_widget.toPlainText()
         lexer = get_lexer_by_name("python")
         tokens = lex(content, lexer)
         self.apply_highlights(text_widget, tokens)
         
-    
 
+        # custom themes and fonts
+        
+    def custom_menu(self):
+        menubar = self.menuBar()
+        
+        self.customize_menu = menubar.addMenu('Customize')
+        
+        theme_menu = QMenu('Theme', self.customize_menu)
+        self.customize_menu.addMenu(theme_menu)
+        themes = ['default', 'clam', 'alt', 'classic']
+        for theme in themes:
+            action = QAction(theme, theme_menu, checkable=True)  #Also add option to uncheck others when checked 1
+            action.toggled.connect(self.update_custom)
+            theme_menu.addAction(action)
+            
+        font_menu = QMenu('Font', self.customize_menu)
+        self.customize_menu.addMenu(font_menu)
+        fonts = ["default", "Helvetica", "Courier"]
+        for font in fonts:
+            action = QAction(font, font_menu, checkable=True)
+            action.toggled.connect(self.update_custom)
+            font_menu.addAction(action)
+            
+    
+    def update_custom(self):
+        current_tab = self.tabs.currentIndex()
+        txt_widget = self.tabs.widget(current_tab)
+        
+        theme = self.theme_var
+        font = self.font_var
+        
+        QApplication.setStyle(QStyleFactory.create(theme))
+        
+        txt_widget.setStyleSheet(f"background-color: {self.get_background_color(theme)}; color: {self.get_text_color(theme)}")
+        txt_widget.setTextColor(Qt.black)
+        txt_widget.setTextBackgroundColor(Qt.white) 
+        txt_widget.setFontPointSize(self.get_font_size(font)) 
+
+
+    # Add line numbers and gutter area
+    
+    # changing initial display size
+    
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -115,4 +164,4 @@ if __name__ == "__main__":
     editor = TextEditor()
     editor.show()
     
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
