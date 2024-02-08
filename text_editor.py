@@ -1,50 +1,15 @@
+from TE_project import __init__, Initialize
 import sys
 from PySide6.QtWidgets import QWidget, QSizePolicy, QApplication, QMenu, QMainWindow, QTextEdit, QFileDialog, QTabWidget, QStyleFactory, QVBoxLayout, QPushButton
 from PySide6.QtGui import QKeySequence, QAction, QColor, QPainter, QPalette
 from PySide6.QtCore import Qt
 from pygments import lex
 from pygments.lexers import get_lexer_by_name
-#from customization import Customization
 
 
-
-class TextEditor(QMainWindow):
-    def __init__(self ):
-        super().__init__()
-
-        self.setWindowTitle("My Text Editor")
+class TextEditor(Initialize, QMainWindow):
         
-        self.tabs = QTabWidget(self)
-        self.tabs.setTabsClosable(True)
-        self.tabs.tabCloseRequested.connect(self.close_tab)
-
-        self.add_tab()
-        self.create_menu()
-        self.setCentralWidget(self.tabs)
-        
-        
-        # theme and customization
-        
-        self.setGeometry(100, 100, 800, 600)
-
-        self.central_widget = QWidget()
-        self.setCentralWidget(self.central_widget)
-
-        layout = QVBoxLayout(self.central_widget)
-
-        self.text_edit = QTextEdit()
-        layout.addWidget(self.text_edit)
-        self.theme_button = QPushButton("Apply Dark Theme")
-        self.theme_button.clicked.connect(self.toggle_theme)
-        layout.addWidget(self.theme_button)
-
-        self.default_stylesheet = QApplication.instance().styleSheet()
-        
-        self.custom_menu()
-        
-
     def add_tab(self):
-        
         text_widget = QTextEdit(self)
         self.tabs.addTab(text_widget, "Untitled")
         
@@ -121,74 +86,6 @@ class TextEditor(QMainWindow):
         
         
         
-        
-    def update_highlights(self, text_widget):
-        content = text_widget.toPlainText()
-        lexer = get_lexer_by_name("python")
-        tokens = lex(content, lexer)
-        self.apply_highlights(text_widget, tokens)
-        
-        
-        
-    def custom_menu(self):
-        menuBar = self.menuBar()
-        self.customize_menu = menuBar.addMenu('Customize')
-        
-        theme_menu = QMenu('Theme', self.customize_menu)
-        self.customize_menu.addMenu(theme_menu)
-        themes = ['light', 'dark']
-        for theme in themes:
-            action = QAction(theme, theme_menu, checkable=True)
-            action.toggled.connect(self.update_custom)
-            theme_menu.addAction(action)
-            
-            
-    def toggle_theme(self):
-        current_stylesheet = self.text_edit.styleSheet()
-        
-        if "dark" in current_stylesheet:
-            self.apply_light_theme()
-        else:
-            self.apply_dark_theme()
-            
-            
-    def apply_dark_theme(self):
-        dark_stylesheet = """
-            QTextEdit {
-                background-color: #2b2b2b;
-                color: #ffffff;
-                selection-background-color: #555555;
-            }
-            QPushButton {
-                background-color: #2b2b2b;
-                color: #ffffff;
-            }
-        """
-        self.text_edit.setStyleSheet(dark_stylesheet)
-        self.theme_button.setText('Light Theme')
-        
-    def apply_light_theme(self):
-        self.text_edit.setStyleSheet(self.default_stylesheet)
-        self.theme_button.setText('Dark Theme')
-        
-    def update_custom(self):
-        if self.tabs is None:
-            return
-        
-        current_tab = self.tabs.currentIndex()
-        tab_widget = self.tabs.widget(current_tab)
-        
-        theme = self.theme_var
-        font = self.font_var
-        
-        QApplication.setStyle(QStyleFactory.create(theme))
-        
-        tab_widget.setStyleSheet(f"background-color: {self.get_background_color(theme)}; color: {self.get_text_color(theme)}")
-        tab_widget.setTextColor(Qt.black)
-        tab_widget.setTextBackgroundColor(Qt.white) 
-        tab_widget.setFontPointSize(self.get_font_size(font)) 
-
-
     # Add line numbers and gutter area
     
     # changing initial display size
