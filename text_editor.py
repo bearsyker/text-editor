@@ -1,13 +1,13 @@
+# from TE_project import appearance, Appearance
 from TE_project import __init__, Initialize
 import sys
-from PySide6.QtWidgets import QWidget, QSizePolicy, QApplication, QMenu, QMainWindow, QTextEdit, QFileDialog, QTabWidget, QStyleFactory, QVBoxLayout, QPushButton
-from PySide6.QtGui import QKeySequence, QAction, QColor, QPainter, QPalette
+from PySide6.QtWidgets import QApplication, QMainWindow, QTextEdit, QFileDialog, QStyleFactory
+from PySide6.QtGui import QKeySequence
 from PySide6.QtCore import Qt
 from pygments import lex
-from pygments.lexers import get_lexer_by_name
 
 
-class TextEditor(Initialize, QMainWindow):
+class TextEditor( Initialize, QMainWindow):
         
     def add_tab(self):
         text_widget = QTextEdit(self)
@@ -82,13 +82,12 @@ class TextEditor(Initialize, QMainWindow):
         text_widget = self.tabs.widget(current_tab)
         text_widget.paste()
         
-        # Add syntax highlighting
-        
         
         
     # Add line numbers and gutter area
     
-    # changing initial display size
+    
+    
     
 
 if __name__ == "__main__":

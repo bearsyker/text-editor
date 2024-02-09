@@ -1,9 +1,5 @@
-import sys
-from PySide6.QtWidgets import QWidget, QSizePolicy, QApplication, QMenu, QMainWindow, QTextEdit, QFileDialog, QTabWidget, QStyleFactory, QVBoxLayout, QPushButton
-from PySide6.QtCore import Qt
-from pygments import lex
-from pygments.lexers import get_lexer_by_name
-#from customization import Customization
+from PySide6.QtWidgets import QTabWidget
+
 
 
 

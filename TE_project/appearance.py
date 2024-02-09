@@ -1,15 +1,16 @@
+import re
+from PySide6.QtWidgets import QWidget, QSizePolicy, QApplication, QMenu, QMainWindow, QTextEdit, QFileDialog, QTabWidget, QStyleFactory
+from PySide6.QtGui import QSyntaxHighlighter ,QKeySequence, QAction, QColor, QPainter, QPalette
+from PySide6.QtCore import Qt
 
-
-    
-class Appearance(TextEditor):
-    def update_highlights(self, text_widget):
-        content = text_widget.toPlainText()
-        lexer = get_lexer_by_name("python")
-        tokens = lex(content, lexer)
-        self.apply_highlights(text_widget, tokens)
+   
+class Appearance():
+    def update_highlights(self):
+        
+        pass
         
         
-        
+      
     def custom_menu(self):
         menuBar = self.menuBar()
         self.customize_menu = menuBar.addMenu('Customize')
@@ -60,8 +61,8 @@ class Appearance(TextEditor):
             }
         """
         
-        self.text_edit.setStyleSheet(self.default_stylesheet)
-        self.theme_button.setText(' light Theme')
+        self.text_edit.setStyleSheet(self.light_stylesheet)
+        self.theme_button.setText('light Theme')
         
         
         
@@ -84,3 +85,19 @@ class Appearance(TextEditor):
             tab_widget.setFontPointSize(self.get_font_size(font)) 
 
         self.tabs.setStyleSheet(f"background-color: {self.get_background_color(theme)}")
+        
+        
+class Highlighter(QSyntaxHighlighter):
+    def __init__(self, parent=None):
+        QSyntaxHighlighter.__init__(self, parent)
+
+        self._mappings = {}
+
+    def add_mapping(self, pattern, format):
+        self._mappings[pattern] = format
+
+    def highlightBlock(self, text):
+        for pattern, format in self._mappings.items():
+            for match in re.finditer(pattern, text):
+                start, end = match.span()
+                self.setFormat(start, end - start, format)
