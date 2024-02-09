@@ -2,9 +2,9 @@
 from TE_project import __init__, Initialize
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QTextEdit, QFileDialog, QStyleFactory
-from PySide6.QtGui import QKeySequence
-from PySide6.QtCore import Qt
-from pygments import lex
+from PySide6.QtGui import QKeySequence, QTextCharFormat, QSyntaxHighlighter
+from PySide6.QtCore import Qt, QRegularExpression
+import re
 
 
 class TextEditor( Initialize, QMainWindow):
@@ -12,7 +12,7 @@ class TextEditor( Initialize, QMainWindow):
     def add_tab(self):
         text_widget = QTextEdit(self)
         self.tabs.addTab(text_widget, "Untitled")
-        
+        self.highlighter = SyntaxHighlighter(text_widget.document())
 
     def create_menu(self):
         menubar = self.menuBar()
@@ -84,6 +84,32 @@ class TextEditor( Initialize, QMainWindow):
         
         
         
+        
+        
+class SyntaxHighlighter(QSyntaxHighlighter):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.highlighter_rules = []
+        
+        keyword_format = QTextCharFormat()
+        keyword_format.setForeground(Qt.darkBlue)
+        keywords = ["def", "class", "if", "else", "elif", "for", "while", "return"]
+        self.add_mapping("\\b(" + "|".join(keywords) + ")\\b", keyword_format)
+        
+        
+    def add_mapping(self, pattern, format):
+        self.highlighter_rules.append((re.compile(pattern), format))
+        
+
+    def highlightBlock(self, text):
+        for pattern, format in self.highlighter_rules:
+            for match in pattern.finditer(text):
+                start, end = match.span()
+                self.setFormat(start, end - start, format)
+                
+                
+                
+                
     # Add line numbers and gutter area
     
     
@@ -93,8 +119,6 @@ class TextEditor( Initialize, QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setStyle(QStyleFactory.create("Fusion"))
-    
     editor = TextEditor()
     editor.show()
-    
     sys.exit(app.exec())

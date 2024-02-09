@@ -16,6 +16,7 @@ class   Initialize():
         self.add_tab()
         self.create_menu()
         self.setCentralWidget(self.tabs)
+        #self.highlighter()
         
         
                           # theme and customization
