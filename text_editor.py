@@ -1,21 +1,25 @@
 # from TE_project import appearance, Appearance
 from TE_project import __init__, Initialize
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QTextEdit, QFileDialog, QStyleFactory
-from PySide6.QtGui import QKeySequence, QTextCharFormat, QSyntaxHighlighter
-from PySide6.QtCore import Qt, QRegularExpression
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLabel, QWidget, QApplication, QMainWindow, QTextEdit, QFileDialog, QStyleFactory
+from PySide6.QtGui import QKeySequence, QPainter, QPaintEvent, QTextCharFormat, QSyntaxHighlighter
+from PySide6.QtCore import QSize, Qt, QRegularExpression
 import re
 
 
-class TextEditor( Initialize, QMainWindow):
+class TextEditor(Initialize, QMainWindow):
         
     def add_tab(self):
         text_widget = QTextEdit(self)
         self.tabs.addTab(text_widget, "Untitled")
         self.highlighter = SyntaxHighlighter(text_widget.document())
+        # self.setup_editor(text_widget)
+        
+        
 
     def create_menu(self):
         menubar = self.menuBar()
+        
         
         file_menu = menubar.addMenu('File')
         file_menu.addAction('New', self.new_file, QKeySequence.New)
@@ -112,8 +116,7 @@ class SyntaxHighlighter(QSyntaxHighlighter):
                 
     # Add line numbers and gutter area
     
-    
-    
+
     
 
 if __name__ == "__main__":
