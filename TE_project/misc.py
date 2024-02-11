@@ -1,3 +1,8 @@
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QTextEdit
+from PySide6.QtGui import QPainter, QPaintEvent, QTextCharFormat, QSyntaxHighlighter
+from PySide6.QtCore import QSize, Qt
+
+
 def setup_editor(self, text_widget):
         self.line_num_area = LineNumbers(self.tabs)  # Pass reference to tabs
         layout = QHBoxLayout()
@@ -10,13 +15,13 @@ def setup_editor(self, text_widget):
         self.update_line_area()
         
     
-    def update_line_area_width(self):
-        width = self.tabs.currentWidget().lineNumberAreaWidth()
-        self.tabs.currentWidget().setViewportMargins(width, 0, 0, 0)    
+def update_line_area_width(self):
+    width = self.tabs.currentWidget().lineNumberAreaWidth()
+    self.tabs.currentWidget().setViewportMargins(width, 0, 0, 0)    
         
     
-    def update_line_area(self):
-        self.line_num_area.update(0, 0, self.lineNumberAreaWidth(), self.tabs.currentWidget().viewport().height())        
+def update_line_area(self):
+    self.line_num_area.update(0, 0, self.lineNumberAreaWidth(), self.tabs.currentWidget().viewport().height())        
 
 
 class LineNumbers(QWidget):
